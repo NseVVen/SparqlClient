@@ -168,7 +168,7 @@ function parse_rdf_triples(xml::EzXML.Document)::Vector{Triple}
             subject = haskey(node, "rdf:about") ? node["rdf:about"] : "(no subject)"
             for child in EzXML.nodes(node)
                 if EzXML.nodetype(child) == EzXML.ELEMENT_NODE
-                    predicate = EzXML.name(child)  # <-- тут!
+                    predicate = EzXML.nodename(child)
                     object = haskey(child, "rdf:resource") ? child["rdf:resource"] :
                              haskey(child, "rdf:nodeID")    ? child["rdf:nodeID"] :
                              join([n.content for n in EzXML.nodes(child) if EzXML.nodetype(n) == EzXML.TEXT_NODE])
@@ -181,6 +181,25 @@ function parse_rdf_triples(xml::EzXML.Document)::Vector{Triple}
     return triples
 end
 
+function predicate_uri(node)
+    prefix = EzXML.namespace(node)
+    local1 = EzXML.nodename(node)
+    # Ищем uri этого префикса вверх по дереву
+    elem = node
+    uri = ""
+    while elem !== nothing && uri == ""
+        ns_attr = "xmlns"
+        if prefix != ""
+            ns_attr *= ":$prefix"
+        end
+        if haskey(EzXML.attrib(elem), ns_attr)
+            uri = EzXML.attrib(elem)[ns_attr]
+        end
+        elem = EzXML.parent(elem)
+    end
+    uri == "" ? local1 : string(uri, local1)
+end
+
 # Extract RDF triples with subjects from RDF/XML
 function extract_rdf_triples(xml::EzXML.Document)::Vector{Triple}
     log_info("extract_rdf_triples called.")
@@ -190,7 +209,7 @@ function extract_rdf_triples(xml::EzXML.Document)::Vector{Triple}
         if EzXML.nodename(node) == "Description"
             subject = haskey(node, "rdf:about") ? node["rdf:about"] : "(no subject)"
             for child in EzXML.elements(node)
-                predicate = EzXML.nodename(child)
+                predicate = predicate_uri(child) # вот тут теперь полный URI!
                 object = haskey(child, "rdf:resource") ? child["rdf:resource"] :
                          haskey(child, "rdf:nodeID")    ? child["rdf:nodeID"] :
                          EzXML.nodecontent(child)
