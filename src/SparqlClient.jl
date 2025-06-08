@@ -259,10 +259,22 @@ function save_to_file(path::String, content::AbstractString)
     log_info("Saved query result to $path")
 end
 
+function pretty_print_json(result::Dict)
+    JSON.print(stdout, result, 2)
+    println()
+end
+
 # Save SELECT result as JSON file
-function save_select_json(result::Dict, path::String)
+function save_select_json(result::Dict, path::String; pretty=false)
     log_info("save_select_json called. Path: $path")
-    save_to_file(path, JSON.json(result))
+    open(path, "w") do io
+        if pretty
+            JSON.print(io, result, 2)  
+        else
+            write(io, JSON.json(result))
+        end
+    end
+    log_info("Saved SELECT result as JSON to $path")
 end
 
 # Save SELECT result as CSV with language column
