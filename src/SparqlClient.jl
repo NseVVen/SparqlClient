@@ -1,3 +1,5 @@
+__precompile__(true)
+
 module SparqlClient
 
 include("Sparql_logger.jl")
@@ -8,7 +10,7 @@ using .SparqlTemplates
 
 # Import required libraries
 using HTTP
-using JSON
+using JSON3
 using EzXML
 using Logging
 using Printf
@@ -72,6 +74,8 @@ function _get_accept_header(qtype::Symbol, fmt::Symbol)::String
         return "application/rdf+xml"
     end
 end
+
+const HTTP_CLIENT = HTTP.Client(pool = true, pipelining = true)
 
 # Execute the SPARQL query over HTTP
 function query(session::SparqlClientSession; extra_params::Dict=Dict())
@@ -138,12 +142,12 @@ function query_and_convert(session::SparqlClientSession; extra_params::Dict=Dict
         if session.queryType == :ask
             log_info("Parsing ASK response")
             return session.returnFormat == :json ?
-                JSON.parse(str_response)["boolean"] :
+                JSON3.parse(str_response)["boolean"] :
                 lowercase(EzXML.text(EzXML.parsexml(str_response)["boolean"])) == "true"
         elseif session.queryType == :select
             log_info("Parsing SELECT response")
             return session.returnFormat == :json ?
-                JSON.parse(str_response) :
+                JSON3.parse(str_response) :
                 EzXML.parsexml(str_response)
         elseif session.queryType in [:construct, :describe]
             log_info("Parsing CONSTRUCT/DESCRIBE response")
@@ -260,7 +264,7 @@ function save_to_file(path::String, content::AbstractString)
 end
 
 function pretty_print_json(result::Dict)
-    JSON.print(stdout, result, 2)
+    JSON3.print(stdout, result, 2)  
     println()
 end
 
@@ -269,9 +273,9 @@ function save_select_json(result::Dict, path::String; pretty=false)
     log_info("save_select_json called. Path: $path")
     open(path, "w") do io
         if pretty
-            JSON.print(io, result, 2)  
+            JSON3.print(io, result, 2)  
         else
-            write(io, JSON.json(result))
+            write(io, JSON3.json(result))
         end
     end
     log_info("Saved SELECT result as JSON to $path")
