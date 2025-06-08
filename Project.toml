@@ -1,0 +1,20 @@
+name = "SparqlClient"
+uuid = "16a1382e-e579-4ee0-aae5-3f1af374b18a"
+authors = ["Maksim <makszarvim@gmail.com>"]
+version = "0.1.0"
+
+[deps]
+Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
+EzXML = "8f5d6c58-4d21-5cfd-889c-e3ad7ee6a615"
+HTTP = "cd3eb016-35fb-5094-929b-558a96fad6f3"
+JSON = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
+Logging = "56ddb016-857b-54e1-b83d-db4d58db5568"
+Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
+
+[compat]
+Dates = "1.11.0"
+EzXML = "1.2.1"
+HTTP = "1.10.16"
+JSON = "0.21.4"
+Logging = "1.11.0"
+Printf = "1.11.0"
