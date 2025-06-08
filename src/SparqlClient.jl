@@ -1,4 +1,4 @@
-module SparqlClient
+module SparqlClient 
 
 include("Sparql_logger.jl")
 include("Sparql_Templates.jl")
@@ -161,7 +161,6 @@ end
 function predicate_uri(node)
     prefix = EzXML.namespace(node)
     local1 = EzXML.nodename(node)
-    # Ищем uri этого префикса вверх по дереву
     elem = node
     uri = ""
     while elem !== nothing && uri == ""
@@ -169,8 +168,9 @@ function predicate_uri(node)
         if prefix != ""
             ns_attr *= ":$prefix"
         end
-        if haskey(EzXML.attrib(elem), ns_attr)
-            uri = EzXML.attrib(elem)[ns_attr]
+        attrs = EzXML.attributes(elem)
+        if haskey(attrs, ns_attr)
+            uri = attrs[ns_attr]
         end
         elem = EzXML.parent(elem)
     end
