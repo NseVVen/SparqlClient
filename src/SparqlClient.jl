@@ -31,13 +31,6 @@ struct Triple
     object::String
 end
 
-# Extended RDF triple with subject (used for DESCRIBE)
-mutable struct RDFTriple
-    subject::String
-    predicate::String
-    object::String
-end
-
 # Constructor with default values and log
 SparqlClientSession(endpoint::String) = begin
     log_info("Initialized SPARQL session with endpoint: $endpoint")
@@ -209,8 +202,8 @@ function extract_rdf_triples(xml::EzXML.Document)::Vector{Triple}
     return triples
 end
 
-# Perform DESCRIBE query and return parsed RDFTriple objects
-function rdf_query_as_triples(session::SparqlClientSession)::Vector{RDFTriple}
+# Perform DESCRIBE query and return parsed Triple objects
+function rdf_query_as_triples(session::SparqlClientSession)::Vector{Triple}
     log_info("rdf_query_as_triples called.")
     doc = query_and_convert(session)
     return extract_rdf_triples(doc)
@@ -319,7 +312,7 @@ export SparqlClientSession,
        set_query, set_query_type, set_return_format,
        query, query_and_convert,
        parse_rdf_triples, extract_rdf_triples,
-       Triple, RDFTriple, rdf_query_as_triples,
+       Triple, rdf_query_as_triples,
        set_query_method, set_template_query, 
        bind_variable, expand_query, apply_template,
        save_to_file, save_select_json, save_select_csv,
