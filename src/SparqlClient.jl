@@ -1,4 +1,4 @@
-module SparqlClient 
+module SparqlClient
 
 include("Sparql_logger.jl")
 include("Sparql_Templates.jl")
@@ -158,25 +158,6 @@ function query_and_convert(session::SparqlClientSession; extra_params::Dict=Dict
     end
 end
 
-function predicate_uri(node)
-    # Получаем префикс предиката, если он есть
-    prefix = EzXML.prefix(node)
-    local1 = EzXML.nodename(node)
-    elem = node
-    uri = ""
-    # Пробегаемся по родителям, чтобы найти xmlns для нужного префикса
-    while elem !== nothing && uri == ""
-        attrs = EzXML.attributes(elem)
-        # аттрибут для пространства имён
-        ns_attr = prefix == "" ? "xmlns" : "xmlns:$prefix"
-        if haskey(attrs, ns_attr)
-            uri = attrs[ns_attr]
-        end
-        elem = EzXML.parent(elem)
-    end
-    return uri == "" ? local1 : string(uri, local1)
-end
-
 # Parse CONSTRUCT XML into simplified Triple list
 function parse_rdf_triples(xml::EzXML.Document)::Vector{Triple}
     log_info("parse_rdf_triples called.")
@@ -187,7 +168,7 @@ function parse_rdf_triples(xml::EzXML.Document)::Vector{Triple}
             subject = haskey(node, "rdf:about") ? node["rdf:about"] : "(no subject)"
             for child in EzXML.nodes(node)
                 if EzXML.nodetype(child) == EzXML.ELEMENT_NODE
-                    predicate = predicate_uri(child)   # <--- Вот тут!
+                    predicate = EzXML.nodename(child)
                     object = haskey(child, "rdf:resource") ? child["rdf:resource"] :
                              haskey(child, "rdf:nodeID")    ? child["rdf:nodeID"] :
                              join([n.content for n in EzXML.nodes(child) if EzXML.nodetype(n) == EzXML.TEXT_NODE])
