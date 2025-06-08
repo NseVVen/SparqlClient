@@ -158,29 +158,6 @@ function query_and_convert(session::SparqlClientSession; extra_params::Dict=Dict
     end
 end
 
-# Parse CONSTRUCT XML into simplified Triple list
-function parse_rdf_triples(xml::EzXML.Document)::Vector{Triple}
-    log_info("parse_rdf_triples called.")
-    triples = Triple[]
-    root = EzXML.root(xml)
-    for node in EzXML.nodes(root)
-        if EzXML.nodename(node) == "Description"
-            subject = haskey(node, "rdf:about") ? node["rdf:about"] : "(no subject)"
-            for child in EzXML.nodes(node)
-                if EzXML.nodetype(child) == EzXML.ELEMENT_NODE
-                    predicate = EzXML.nodename(child)
-                    object = haskey(child, "rdf:resource") ? child["rdf:resource"] :
-                             haskey(child, "rdf:nodeID")    ? child["rdf:nodeID"] :
-                             join([n.content for n in EzXML.nodes(child) if EzXML.nodetype(n) == EzXML.TEXT_NODE])
-                    push!(triples, Triple(subject, predicate, object))
-                end
-            end
-        end
-    end
-    log_info("Parsed $(length(triples)) triples from CONSTRUCT.")
-    return triples
-end
-
 function predicate_uri(node)
     prefix = EzXML.namespace(node)
     local1 = EzXML.nodename(node)
@@ -200,6 +177,29 @@ function predicate_uri(node)
     uri == "" ? local1 : string(uri, local1)
 end
 
+# Parse CONSTRUCT XML into simplified Triple list
+function parse_rdf_triples(xml::EzXML.Document)::Vector{Triple}
+    log_info("parse_rdf_triples called.")
+    triples = Triple[]
+    root = EzXML.root(xml)
+    for node in EzXML.nodes(root)
+        if EzXML.nodename(node) == "Description"
+            subject = haskey(node, "rdf:about") ? node["rdf:about"] : "(no subject)"
+            for child in EzXML.nodes(node)
+                if EzXML.nodetype(child) == EzXML.ELEMENT_NODE
+                    predicate = predicate_uri(child)   # <--- Вот тут!
+                    object = haskey(child, "rdf:resource") ? child["rdf:resource"] :
+                             haskey(child, "rdf:nodeID")    ? child["rdf:nodeID"] :
+                             join([n.content for n in EzXML.nodes(child) if EzXML.nodetype(n) == EzXML.TEXT_NODE])
+                    push!(triples, Triple(subject, predicate, object))
+                end
+            end
+        end
+    end
+    log_info("Parsed $(length(triples)) triples from CONSTRUCT.")
+    return triples
+end
+
 # Extract RDF triples with subjects from RDF/XML
 function extract_rdf_triples(xml::EzXML.Document)::Vector{Triple}
     log_info("extract_rdf_triples called.")
@@ -209,7 +209,7 @@ function extract_rdf_triples(xml::EzXML.Document)::Vector{Triple}
         if EzXML.nodename(node) == "Description"
             subject = haskey(node, "rdf:about") ? node["rdf:about"] : "(no subject)"
             for child in EzXML.elements(node)
-                predicate = predicate_uri(child) # вот тут теперь полный URI!
+                predicate = EzXML.nodename(child)
                 object = haskey(child, "rdf:resource") ? child["rdf:resource"] :
                          haskey(child, "rdf:nodeID")    ? child["rdf:nodeID"] :
                          EzXML.nodecontent(child)
