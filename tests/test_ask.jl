@@ -1,7 +1,5 @@
 using SparqlClient
 
-# Enable logging for debugging and traceability
-
 # Create a new SPARQL client session for the DBpedia endpoint
 session = SparqlClientSession("https://dbpedia.org/sparql")
 

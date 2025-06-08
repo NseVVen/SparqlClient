@@ -1,6 +1,5 @@
 using SparqlClient
 
-init_logger("select") 
 
 # Create a new SPARQL session with DBpedia endpoint
 session = SparqlClientSession("https://dbpedia.org/sparql")

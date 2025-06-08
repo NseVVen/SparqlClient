@@ -1,7 +1,7 @@
 using SparqlClient
 
 # Enable logging for debugging purposes
-enable_logging()
+
 
 # Create a new session targeting the DBpedia SPARQL endpoint
 session = SparqlClientSession("https://dbpedia.org/sparql")
