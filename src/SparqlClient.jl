@@ -159,22 +159,22 @@ function query_and_convert(session::SparqlClientSession; extra_params::Dict=Dict
 end
 
 function predicate_uri(node)
-    prefix = EzXML.namespace(node)
+    # Получаем префикс предиката, если он есть
+    prefix = EzXML.prefix(node)
     local1 = EzXML.nodename(node)
     elem = node
     uri = ""
+    # Пробегаемся по родителям, чтобы найти xmlns для нужного префикса
     while elem !== nothing && uri == ""
-        ns_attr = "xmlns"
-        if prefix != ""
-            ns_attr *= ":$prefix"
-        end
         attrs = EzXML.attributes(elem)
+        # аттрибут для пространства имён
+        ns_attr = prefix == "" ? "xmlns" : "xmlns:$prefix"
         if haskey(attrs, ns_attr)
             uri = attrs[ns_attr]
         end
         elem = EzXML.parent(elem)
     end
-    uri == "" ? local1 : string(uri, local1)
+    return uri == "" ? local1 : string(uri, local1)
 end
 
 # Parse CONSTRUCT XML into simplified Triple list
