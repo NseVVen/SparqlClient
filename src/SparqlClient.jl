@@ -75,8 +75,6 @@ function _get_accept_header(qtype::Symbol, fmt::Symbol)::String
     end
 end
 
-const HTTP_CLIENT = HTTP.Client(pool = true, pipelining = true)
-
 # Execute the SPARQL query over HTTP
 function query(session::SparqlClientSession; extra_params::Dict=Dict())
     log_info("query called. Method: $(session.use_post ? "POST" : "GET"), Endpoint: $(session.endpoint)")
