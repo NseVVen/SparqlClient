@@ -168,7 +168,7 @@ function parse_rdf_triples(xml::EzXML.Document)::Vector{Triple}
             subject = haskey(node, "rdf:about") ? node["rdf:about"] : "(no subject)"
             for child in EzXML.nodes(node)
                 if EzXML.nodetype(child) == EzXML.ELEMENT_NODE
-                    predicate = EzXML.nodename(child)
+                    predicate = EzXML.name(child)  # <-- тут!
                     object = haskey(child, "rdf:resource") ? child["rdf:resource"] :
                              haskey(child, "rdf:nodeID")    ? child["rdf:nodeID"] :
                              join([n.content for n in EzXML.nodes(child) if EzXML.nodetype(n) == EzXML.TEXT_NODE])
