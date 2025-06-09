@@ -280,7 +280,7 @@ function save_select_json(result, path::String; pretty=false)
 end
 
 # Save SELECT result as CSV with language column
-function save_select_csv(result::Dict, path::String)
+function save_select_csv(result, path::String)
     log_info("save_select_csv called. Path: $path")
     vars = result["head"]["vars"]
     rows = result["results"]["bindings"]
