@@ -267,7 +267,7 @@ function pretty_print_json(result::Dict)
 end
 
 # Save SELECT result as JSON file
-function save_select_json(result::Dict, path::String; pretty=false)
+function save_select_json(result, path::String; pretty=false)
     log_info("save_select_json called. Path: $path")
     open(path, "w") do io
         if pretty
