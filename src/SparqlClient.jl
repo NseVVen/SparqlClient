@@ -271,7 +271,7 @@ function save_select_json(result, path::String; pretty=false)
     log_info("save_select_json called. Path: $path")
     open(path, "w") do io
         if pretty
-            JSON3.print(io, result, 2)  
+            JSON3.print(io, result)  
         else
             write(io, JSON3.json(result))
         end
@@ -280,31 +280,34 @@ function save_select_json(result, path::String; pretty=false)
 end
 
 # Save SELECT result as CSV with language column
-function save_select_csv(result, path::String)
+function save_select_csv(result::AbstractDict, path::String)
     log_info("save_select_csv called. Path: $path")
     vars = result["head"]["vars"]
     rows = result["results"]["bindings"]
 
     open(path, "w") do io
-        extended_vars = vcat(vars, ["lang"])
-        println(io, join(extended_vars, ","))
+        # заголовки: все переменные плюс столбец lang
+        println(io, join(vcat(vars, ["lang"]), ","))
 
         for row in rows
             values = String[]
             lang_value = ""
             for var in vars
+                # достаём binding по имени переменной
                 val_dict = get(row, var, nothing)
-                if val_dict isa Dict
+                # теперь проверяем любой словарь, не только Dict
+                if val_dict isa AbstractDict
                     push!(values, get(val_dict, "value", ""))
                     lang_value = get(val_dict, "xml:lang", "")
                 else
                     push!(values, "")
                 end
             end
-            push!(values, lang_value)
-            println(io, join(values, ","))
+            # добавляем значение языка в конец строки
+            println(io, join(vcat(values, [lang_value]), ","))
         end
     end
+
     log_info("Saved SELECT result as CSV (with language) to $path")
 end
 
