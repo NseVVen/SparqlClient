@@ -273,7 +273,7 @@ function save_select_json(result, path::String; pretty=false)
         if pretty
             JSON3.print(io, result)  
         else
-            write(io, JSON3.json(result))
+            JSON3.write(io, result)
         end
     end
     log_info("Saved SELECT result as JSON to $path")
