@@ -75,42 +75,6 @@ function _get_accept_header(qtype::Symbol, fmt::Symbol)::String
     end
 end
 
-# Execute the SPARQL query over HTTP
-function query(session::SparqlClientSession; extra_params::Dict=Dict())
-    log_info("query called. Method: $(session.use_post ? "POST" : "GET"), Endpoint: $(session.endpoint)")
-    if session.query === nothing
-        log_error("Query not set before sending.")
-        error("Query not set.")
-    end
-
-    headers = Dict("Accept" => _get_accept_header(session.queryType, session.returnFormat))
-    log_info("Sending SPARQL query via $(session.use_post ? "POST" : "GET") to $(session.endpoint)")
-
-    try
-        if session.use_post
-            form_data = Dict("query" => session.query)
-            merge!(form_data, extra_params)
-            response = HTTP.post(session.endpoint, headers=headers, body=HTTP.Form(form_data))
-        else
-            query_params = Dict("query" => session.query)
-            merge!(query_params, extra_params)
-            response = HTTP.get(session.endpoint, query=query_params, headers=headers)
-        end
-
-        if response.status != 200
-            log_error("SPARQL error $(response.status): $(String(response.body))")
-            error("SPARQL endpoint returned error")
-        end
-
-        log_info("Query successful. Status: $(response.status)")
-        return response.body
-
-    catch e
-        log_error("HTTP request failed: $(e)")
-        rethrow(e)
-    end
-end
-
 # Set HTTP method for the query
 function set_query_method(session::SparqlClientSession, method::Symbol)
     log_info("set_query_method called. Method: $method")
@@ -123,6 +87,48 @@ function set_query_method(session::SparqlClientSession, method::Symbol)
     else
         log_error("Unsupported HTTP method: $method")
         error("Unsupported HTTP method. Use :get or :post.")
+    end
+end
+
+# Execute the SPARQL query over HTTP
+function query(session::SparqlClientSession; extra_params::Dict=Dict())
+    log_info("query called. Method: $(session.use_post ? "POST" : "GET"), Endpoint: $(session.endpoint)")
+    
+    if session.query === nothing
+        log_error("Query not set before sending.")
+        error("Query not set.")
+    end
+
+    headers = Dict("Accept" => _get_accept_header(session.queryType, session.returnFormat))
+    log_info("Sending SPARQL query via $(session.use_post ? "POST" : "GET") to $(session.endpoint)")
+
+    try
+        start_time = time()
+
+        response = if session.use_post
+            form_data = Dict("query" => session.query)
+            merge!(form_data, extra_params)
+            HTTP.post(session.endpoint, headers=headers, body=HTTP.Form(form_data))
+        else
+            query_params = Dict("query" => session.query)
+            merge!(query_params, extra_params)
+            HTTP.get(session.endpoint, query=query_params, headers=headers)
+        end
+
+        elapsed = time() - start_time
+        log_info(@sprintf("Query completed in %.3f seconds", elapsed))
+
+        if response.status != 200
+            log_error("SPARQL error $(response.status): $(String(response.body))")
+            error("SPARQL endpoint returned error")
+        end
+
+        log_info("Query successful. Status: $(response.status)")
+        return response.body
+
+    catch e
+        log_error("HTTP request failed: $(e)")
+        rethrow(e)
     end
 end
 
