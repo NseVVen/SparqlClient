@@ -278,7 +278,7 @@ end
 """
     bind_variable(session::SparqlClientSession, name::String, value::String)
 
-Привязывает значение `value` к переменной `{{$name}}` в шаблоне.
+Привязывает значение `value` к переменной `{{name}}` в шаблоне.
 """
 function bind_variable(session::SparqlClientSession, name::String, value::String)
     log_info("bind_variable called for $name → $value")
