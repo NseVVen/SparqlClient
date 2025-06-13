@@ -165,6 +165,22 @@ function query(session::SparqlClientSession; extra_params::Dict=Dict())
     end
 end
 
+"""
+    _get_accept_header(qtype::Symbol, fmt::Symbol) → String
+
+Формирует и возвращает значение HTTP-заголовка `Accept` для SPARQL-запроса.
+
+# Аргументы
+- `qtype::Symbol` — тип SPARQL-запроса (`:select`, `:ask`, `:construct` или `:describe`).
+- `fmt::Symbol` — ожидаемый формат ответа (`:json`, `:xml` или `:rdf`).
+
+# Возвращает
+- Для `:select` и `:ask`:
+  - `"application/sparql-results+json"`, если `fmt == :json`
+  - `"application/sparql-results+xml"`, если `fmt == :xml`
+- Для `:construct` и `:describe`:
+  - `"application/rdf+xml"`
+"""
 function _get_accept_header(qtype::Symbol, fmt::Symbol)::String
     if qtype in (:select, :ask)
         return fmt == :json ? "application/sparql-results+json" : "application/sparql-results+xml"
