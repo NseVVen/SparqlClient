@@ -1,5 +1,3 @@
-__precompile__(true)
-
 module SparqlClient
 
 include("Sparql_logger.jl")
