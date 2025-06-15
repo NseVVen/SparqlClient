@@ -219,12 +219,16 @@ function query_and_convert(session::SparqlClientSession; extra_params::Dict=Dict
 
     if session.queryType == :ask
         log_info("Parsing ASK response")
-        return session.returnFormat == :json ? 
-            JSON3.parse(s)["boolean"] :
-            let
-                doc = EzXML.parsexml(s)
-                bool_nodes = EzXML.find(doc, "//boolean")
-                lowercase(EzXML.nodecontent(first(bool_nodes))) == "true"
+        return session.returnFormat == :json ? JSON3.parse(s)["boolean"] :
+            begin
+                doc  = EzXML.parsexml(s)
+                root = EzXML.root(doc)
+                for node in EzXML.descendants(root)
+                    if EzXML.nodename(node) == "boolean"
+                        return lowercase(EzXML.nodecontent(node)) == "true"
+                    end
+                end
+                error("ASK response contains no <boolean> element")
             end
 
     elseif session.queryType == :select
@@ -240,6 +244,7 @@ function query_and_convert(session::SparqlClientSession; extra_params::Dict=Dict
         error("Unsupported query type.")
     end
 end
+
 
 
 # Парсинг RDF/XML ответов
