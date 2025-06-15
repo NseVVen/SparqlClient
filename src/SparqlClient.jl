@@ -259,21 +259,15 @@ end
 Извлекает простой список `Triple(subject,predicate,object)` из CONSTRUCT-ответа.
 """
 function parse_rdf_triples(xml::EzXML.Document)::Vector{Triple}
-    log_info("parse_rdf_triples called.")
+       log_info("extract_rdf_triples called.")
     triples = Triple[]
     root = EzXML.root(xml)
 
     for node in EzXML.elements(root)
-        # Интересуют только узлы <Description>
         EzXML.nodename(node) == "Description" || continue
-
-        # subject: атрибут rdf:about или "(no subject)"
         subj = haskey(node, "rdf:about") ? node["rdf:about"] : "(no subject)"
-
         for child in EzXML.elements(node)
             pred = EzXML.nodename(child)
-
-            # object: сначала rdf:resource, потом rdf:nodeID, иначе текст ноды
             obj = if haskey(child, "rdf:resource")
                 child["rdf:resource"]
             elseif haskey(child, "rdf:nodeID")
@@ -286,9 +280,39 @@ function parse_rdf_triples(xml::EzXML.Document)::Vector{Triple}
         end
     end
 
-    log_info("Parsed $(length(triples)) triples")
+    log_info("Extracted $(length(triples)) triples")
     return triples
 end
+#     log_info("parse_rdf_triples called.")
+#     triples = Triple[]
+#     root = EzXML.root(xml)
+
+#     for node in EzXML.elements(root)
+#         # Интересуют только узлы <Description>
+#         EzXML.nodename(node) == "Description" || continue
+
+#         # subject: атрибут rdf:about или "(no subject)"
+#         subj = haskey(node, "rdf:about") ? node["rdf:about"] : "(no subject)"
+
+#         for child in EzXML.elements(node)
+#             pred = EzXML.nodename(child)
+
+#             # object: сначала rdf:resource, потом rdf:nodeID, иначе текст ноды
+#             obj = if haskey(child, "rdf:resource")
+#                 child["rdf:resource"]
+#             elseif haskey(child, "rdf:nodeID")
+#                 child["rdf:nodeID"]
+#             else
+#                 EzXML.nodecontent(child)
+#             end
+
+#             push!(triples, Triple(subj, pred, obj))
+#         end
+#     end
+
+#     log_info("Parsed $(length(triples)) triples")
+#     return triples
+# end
 
 
 """
