@@ -8,58 +8,8 @@ export SELECT_LABELS_BY_CLASS,
        SELECT_TYPES_OF_RESOURCE,
        SELECT_PREDICATES_OF_RESOURCE,
        SELECT_OBJECTS_BY_PREDICATE,
-       SELECT_SUBJECTS_REFERRING_RESOURCE,
-       set_template_query, bind_variable, 
-       expand_query, apply_template 
+       SELECT_SUBJECTS_REFERRING_RESOURCE
 
-
-"""
-    set_template_query(session::SparqlClientSession, template::String)
-
-Устанавливает шаблон `template` для последующей подстановки.
-"""
-function set_template_query(session::SparqlClientSession, template::String)
-    log_info("set_template_query called.")
-    session.template_query = template
-    session.bindings = Dict()
-    log_info("Template set.")
-end
-
-"""
-    bind_variable(session::SparqlClientSession, name::String, value::String)
-
-Привязывает значение `value` к переменной `{{name}}` в шаблоне.
-"""
-function bind_variable(session::SparqlClientSession, name::String, value::String)
-    log_info("bind_variable called for $name → $value")
-    session.bindings[name] = value
-end
-
-"""
-    expand_query(session::SparqlClientSession) → String
-
-Разворачивает текущий `template_query` с учётом всех `bindings`.
-"""
-function expand_query(session::SparqlClientSession)::String
-    log_info("expand_query called.")
-    session.template_query === nothing && error("Template not set.")
-    q = session.template_query
-    for (k,v) in session.bindings
-        q = replace(q, "{{$k}}"=>v)
-    end
-    occursin(r"\{\{.*?\}\}", q) && error("Unresolved variables remain.")
-    return q
-end
-
-"""
-    apply_template(session::SparqlClientSession)
-
-Разворачивает и сразу устанавливает результат как `session.query`.
-"""
-function apply_template(session::SparqlClientSession)
-    log_info("apply_template called.")
-    set_query(session, expand_query(session))
-end
 
 """
 Returns labels for all resources of the given class.
