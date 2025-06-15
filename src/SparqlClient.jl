@@ -285,20 +285,29 @@ end
 function extract_rdf_triples(xml::EzXML.Document)::Vector{Triple}
     log_info("extract_rdf_triples called.")
     triples = Triple[]
-    for node in EzXML.elements(EzXML.root(xml))
+    root = EzXML.root(xml)
+
+    for node in EzXML.elements(root)
         EzXML.nodename(node) == "Description" || continue
-        subj = get(node, "rdf:about", "(no subject)")
+        subj = haskey(node, "rdf:about") ? node["rdf:about"] : "(no subject)"
         for child in EzXML.elements(node)
             pred = EzXML.nodename(child)
-            obj = get(child, "rdf:resource", nothing) !== nothing ? child["rdf:resource"] :
-                  get(child, "rdf:nodeID", nothing)    !== nothing ? child["rdf:nodeID"] :
-                  EzXML.nodecontent(child)
-            push!(triples, Triple(subj,pred,obj))
+            obj = if haskey(child, "rdf:resource")
+                child["rdf:resource"]
+            elseif haskey(child, "rdf:nodeID")
+                child["rdf:nodeID"]
+            else
+                EzXML.nodecontent(child)
+            end
+
+            push!(triples, Triple(subj, pred, obj))
         end
     end
+
     log_info("Extracted $(length(triples)) triples")
     return triples
 end
+
 
 """
     rdf_query_as_triples(session::SparqlClientSession) → Vector{Triple}
