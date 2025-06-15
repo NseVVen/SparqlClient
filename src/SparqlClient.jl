@@ -209,7 +209,7 @@ function query_and_convert(session::SparqlClientSession; extra_params::Dict=Dict
     if session.queryType == :ask
         log_info("Parsing ASK response")
         return session.returnFormat == :json ? JSON3.parse(s)["boolean"] :
-               lowercase(EzXML.text(EzXML.parsexml(s)["boolean"])) == "true"
+               lowercase(EzXML.nodecontent(EzXML.findfirst(EzXML.parsexml(s), "//boolean"))) == "true"
     elseif session.queryType == :select
         log_info("Parsing SELECT response")
         return session.returnFormat == :json ? JSON3.parse(s) : EzXML.parsexml(s)
