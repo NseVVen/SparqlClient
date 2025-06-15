@@ -21,7 +21,10 @@ export SparqlClientSession, Triple, set_query, set_query_type, set_return_format
        save_to_file, save_select_json, save_select_csv,
        save_ask_result, save_rdf_xml, init_logger, enable_logging, _get_accept_header,
        apply_template, expand_query, bind_variable, set_template_query, log_info, 
-       log_warn, log_error, enable_logging, init_logger,
+       log_warn, log_error, enable_logging, init_logger,SELECT_LABELS_BY_CLASS,
+       ASK_TYPE, CONSTRUCT_RESOURCE, DESCRIBE_URI, SELECT_TYPES_OF_RESOURCE,
+       SELECT_PREDICATES_OF_RESOURCE, SELECT_OBJECTS_BY_PREDICATE,
+       SELECT_SUBJECTS_REFERRING_RESOURCE
 
 
 # Основные типы
