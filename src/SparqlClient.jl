@@ -223,7 +223,7 @@ function query_and_convert(session::SparqlClientSession; extra_params::Dict=Dict
             begin
                 doc  = EzXML.parsexml(s)
                 root = EzXML.root(doc)
-                for node in EzXML.descendants(root)
+                for node in EzXML.elements(root)
                     if EzXML.nodename(node) == "boolean"
                         return lowercase(EzXML.nodecontent(node)) == "true"
                     end
@@ -244,7 +244,6 @@ function query_and_convert(session::SparqlClientSession; extra_params::Dict=Dict
         error("Unsupported query type.")
     end
 end
-
 
 
 # Парсинг RDF/XML ответов
