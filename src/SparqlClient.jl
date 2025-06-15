@@ -261,21 +261,35 @@ end
 function parse_rdf_triples(xml::EzXML.Document)::Vector{Triple}
     log_info("parse_rdf_triples called.")
     triples = Triple[]
-    for node in EzXML.nodes(EzXML.root(xml))
+    root = EzXML.root(xml)
+
+    for node in EzXML.elements(root)
+        # Интересуют только узлы <Description>
         EzXML.nodename(node) == "Description" || continue
-        subj = get(node, "rdf:about", "(no subject)")
-        for child in EzXML.nodes(node)
-            EzXML.nodetype(child) != EzXML.ELEMENT_NODE && continue
+
+        # subject: атрибут rdf:about или "(no subject)"
+        subj = haskey(node, "rdf:about") ? node["rdf:about"] : "(no subject)"
+
+        for child in EzXML.elements(node)
             pred = EzXML.nodename(child)
-            obj = get(child, "rdf:resource", nothing) !== nothing ? child["rdf:resource"] :
-                  get(child, "rdf:nodeID", nothing)    !== nothing ? child["rdf:nodeID"] :
-                  join(text for text in EzXML.nodes(child) if EzXML.nodetype(text)==EzXML.TEXT_NODE)
-            push!(triples, Triple(subj,pred,obj))
+
+            # object: сначала rdf:resource, потом rdf:nodeID, иначе текст ноды
+            obj = if haskey(child, "rdf:resource")
+                child["rdf:resource"]
+            elseif haskey(child, "rdf:nodeID")
+                child["rdf:nodeID"]
+            else
+                EzXML.nodecontent(child)
+            end
+
+            push!(triples, Triple(subj, pred, obj))
         end
     end
+
     log_info("Parsed $(length(triples)) triples")
     return triples
 end
+
 
 """
     extract_rdf_triples(xml::EzXML.Document) → Vector{Triple}
