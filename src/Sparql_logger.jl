@@ -1,6 +1,6 @@
 module SparqlLogger
 
-
+export log_info, log_warn, log_error, enable_logging, init_logger
 
 using Dates
 
