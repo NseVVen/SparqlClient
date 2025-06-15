@@ -20,7 +20,8 @@ export SparqlClientSession, Triple, set_query, set_query_type, set_return_format
        set_template_query, bind_variable, expand_query, apply_template,
        save_to_file, save_select_json, save_select_csv,
        save_ask_result, save_rdf_xml, init_logger, enable_logging, _get_accept_header,
-       apply_template, expand_query, bind_variable, set_template_query
+       apply_template, expand_query, bind_variable, set_template_query, log_info, 
+       log_warn, log_error, enable_logging, init_logger,
 
 
 # Основные типы
