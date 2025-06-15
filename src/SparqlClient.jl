@@ -216,21 +216,25 @@ function query_and_convert(session::SparqlClientSession; extra_params::Dict=Dict
     elapsed = time() - start_time
     log_info(@sprintf("Query+convert in %.3f seconds", elapsed))
     s = String(raw)
+
     if session.queryType == :ask
         log_info("Parsing ASK response")
         return session.returnFormat == :json ? 
             JSON3.parse(s)["boolean"] :
-            lowercase(
-                EzXML.nodecontent(
-                    EzXML.root(EzXML.parsexml(s))["boolean"]
-                )
-            ) == "true"
+            let
+                doc = EzXML.parsexml(s)
+                bool_nodes = EzXML.find(doc, "//boolean")
+                lowercase(EzXML.nodecontent(first(bool_nodes))) == "true"
+            end
+
     elseif session.queryType == :select
         log_info("Parsing SELECT response")
         return session.returnFormat == :json ? JSON3.parse(s) : EzXML.parsexml(s)
+
     elseif session.queryType in (:construct, :describe)
         log_info("Parsing CONSTRUCT/DESCRIBE response")
         return EzXML.parsexml(s)
+
     else
         log_error("Unsupported type in convert: $(session.queryType)")
         error("Unsupported query type.")
