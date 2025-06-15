@@ -18,7 +18,7 @@ export SparqlClientSession, Triple, set_query, set_query_type, set_return_format
        set_query_method, query, query_and_convert,
        parse_rdf_triples, extract_rdf_triples, rdf_query_as_triples,
        set_template_query, bind_variable, expand_query, apply_template,
-       save_to_file, save_select_json, save_select_csv,
+       save_to_file, save_select_xml, save_select_json, save_select_csv,
        save_ask_result, save_rdf_xml, init_logger, enable_logging, _get_accept_header,
        apply_template, expand_query, bind_variable, set_template_query, log_info, 
        log_warn, log_error, enable_logging, init_logger,SELECT_LABELS_BY_CLASS,
@@ -346,6 +346,16 @@ end
 function save_to_file(path::String, content::AbstractString)
     log_info("save_to_file called. Path: $path")
     open(path,"w") do io write(io,content) end
+end
+
+"""
+    save_select_xml(doc::EzXML.Document, path::String)
+
+Сохраняет результат SELECT-запроса (в формате XML) в файл `path`.
+"""
+function save_select_xml(doc::EzXML.Document, path::String)
+    log_info("save_select_xml called. Path: $path")
+    save_to_file(path, sprint(print, doc))
 end
 
 """
