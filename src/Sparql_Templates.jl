@@ -1,6 +1,5 @@
 module SparqlTemplates
 
-# Export all available SPARQL query templates
 export SELECT_LABELS_BY_CLASS,
        ASK_TYPE,
        CONSTRUCT_RESOURCE,
