@@ -11,11 +11,11 @@ export SELECT_LABELS_BY_CLASS,
 
 
 """
-Returns labels for all resources of the given class.
-Parameters:
-  - {{class}}  — URI of the class
-  - {{lang}}   — preferred label language
-  - {{limit}}  — result limit
+Возвращает метки для всех ресурсов указанного класса.
+Параметры:
+  - {{class}}  — URI класса
+  - {{lang}}   — предпочитаемый язык меток
+  - {{limit}}  — ограничение на число результатов
 """
 const SELECT_LABELS_BY_CLASS = """
 SELECT ?entity ?label WHERE {
@@ -27,10 +27,10 @@ LIMIT {{limit}}
 """
 
 """
-Checks if the resource is of the given RDF type.
-Parameters:
-  - {{resource}} — the resource URI
-  - {{type}}     — RDF class/type to check
+Проверяет, является ли ресурс указанного RDF-типа.
+Параметры:
+  - {{resource}} — URI ресурса
+  - {{type}}     — проверяемый класс/тип RDF
 """
 const ASK_TYPE = """
 ASK {
@@ -39,10 +39,10 @@ ASK {
 """
 
 """
-Returns all predicate-object pairs for the specified subject.
-Parameters:
-  - {{subject}} — subject URI
-  - {{limit}}   — result limit
+Возвращает все пары предикат-объект для указанного субъекта.
+Параметры:
+  - {{subject}} — URI субъекта
+  - {{limit}}   — ограничение на число результатов
 """
 const CONSTRUCT_RESOURCE = """
 CONSTRUCT {
@@ -54,18 +54,18 @@ LIMIT {{limit}}
 """
 
 """
-DESCRIBE query for the specified resource.
-Parameters:
-  - {{uri}} — URI of the resource to describe
+DESCRIBE-запрос для указанного ресурса.
+Параметры:
+  - {{uri}} — URI описываемого ресурса
 """
 const DESCRIBE_URI = """
 DESCRIBE {{uri}}
 """
 
 """
-Retrieves all RDF types (rdf:type) of the resource.
-Parameters:
-  - {{resource}} — resource URI
+Получает все RDF-типы (rdf:type) ресурса.
+Параметры:
+  - {{resource}} — URI ресурса
 """
 const SELECT_TYPES_OF_RESOURCE = """
 SELECT ?type WHERE {
@@ -74,9 +74,9 @@ SELECT ?type WHERE {
 """
 
 """
-Retrieves all predicates associated with the resource.
-Parameters:
-  - {{resource}} — resource URI
+Получает все предикаты, связанные с ресурсом.
+Параметры:
+  - {{resource}} — URI ресурса
 """
 const SELECT_PREDICATES_OF_RESOURCE = """
 SELECT DISTINCT ?p WHERE {
@@ -85,10 +85,10 @@ SELECT DISTINCT ?p WHERE {
 """
 
 """
-Retrieves all distinct objects for a given predicate.
-Parameters:
-  - {{predicate}} — predicate URI
-  - {{limit}}     — result limit
+Получает все уникальные объекты по заданному предикату.
+Параметры:
+  - {{predicate}} — URI предиката
+  - {{limit}}     — ограничение на число результатов
 """
 const SELECT_OBJECTS_BY_PREDICATE = """
 SELECT DISTINCT ?o WHERE {
@@ -98,10 +98,10 @@ LIMIT {{limit}}
 """
 
 """
-Finds all subjects that reference the given resource.
-Parameters:
-  - {{resource}} — resource URI
-  - {{limit}}    — result limit
+Находит все субъекты, которые ссылаются на указанный ресурс.
+Параметры:
+  - {{resource}} — URI ресурса
+  - {{limit}}    — ограничение на число результатов
 """
 const SELECT_SUBJECTS_REFERRING_RESOURCE = """
 SELECT ?s WHERE {
@@ -110,4 +110,4 @@ SELECT ?s WHERE {
 LIMIT {{limit}}
 """
 
-end 
+end
