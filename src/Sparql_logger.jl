@@ -4,11 +4,8 @@ export log_info, log_warn, log_error, enable_logging, init_logger
 
 using Dates
 
-# Путь и дескриптор файла
 const log_path_ref = Ref{String}("")
 const log_file_ref = Ref{IO}(stdout)
-
-# Два отдельных флага: писать в файл и/или в консоль
 const _console_on = Ref(false)
 const _file_on    = Ref(false)
 
@@ -21,7 +18,6 @@ const _file_on    = Ref(false)
 function init_logger(query_type::String)
     ts = Dates.format(now(), "yyyy-mm-dd_HHMMSS")
     log_path_ref[] = "sparql_log_$(query_type)_$(ts).log"
-    # открываем файл (старый, если был — перезапишется)
     log_file_ref[] = open(log_path_ref[], "w")
     _file_on[] = true
     log_info("Logging initialized in file $(log_path_ref[])")
@@ -62,4 +58,4 @@ log_info(msg)  = log_msg("INFO",  msg)
 log_warn(msg)  = log_msg("WARN",  msg)
 log_error(msg) = log_msg("ERROR", msg)
 
-end # module SparqlLogger
+end
