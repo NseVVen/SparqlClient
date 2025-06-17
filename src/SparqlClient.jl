@@ -15,7 +15,7 @@ using Printf
 
 export SparqlClientSession, Triple, set_query, set_query_type, set_return_format,
        set_query_method, query, query_and_convert,
-       parse_rdf_triples, extract_rdf_triples, rdf_query_as_triples,
+       parse_rdf_triples, rdf_query_as_triples,
        set_template_query, bind_variable, expand_query, apply_template,
        save_to_file, save_select_xml, save_select_json, save_select_csv,
        save_ask_result, save_rdf_xml, init_logger, enable_logging, _get_accept_header,
@@ -248,7 +248,7 @@ end
 """
     parse_rdf_triples(xml::EzXML.Document) → Vector{Triple}
 
-Извлекает простой список `Triple(subject,predicate,object)` из CONSTRUCT-ответа.
+Извлекает простой список `Triple(subject,predicate,object)` из CONSTRUCT и DESCRIBE-ответа.
 """
 function parse_rdf_triples(xml::EzXML.Document)::Vector{Triple}
     log_info("parse_rdf_triples called.")
@@ -274,38 +274,6 @@ function parse_rdf_triples(xml::EzXML.Document)::Vector{Triple}
     end
 
     log_info("Parsed $(length(triples)) triples")
-    return triples
-end
-
-
-"""
-    extract_rdf_triples(xml::EzXML.Document) → Vector{Triple}
-
-Как `parse_rdf_triples`, но для DESCRIBE: возвращает `subject,predicate,object`.
-"""
-function extract_rdf_triples(xml::EzXML.Document)::Vector{Triple}
-    log_info("extract_rdf_triples called.")
-    triples = Triple[]
-    root = EzXML.root(xml)
-
-    for node in EzXML.elements(root)
-        EzXML.nodename(node) == "Description" || continue
-        subj = haskey(node, "rdf:about") ? node["rdf:about"] : "(no subject)"
-        for child in EzXML.elements(node)
-            pred = EzXML.nodename(child)
-            obj = if haskey(child, "rdf:resource")
-                child["rdf:resource"]
-            elseif haskey(child, "rdf:nodeID")
-                child["rdf:nodeID"]
-            else
-                EzXML.nodecontent(child)
-            end
-
-            push!(triples, Triple(subj, pred, obj))
-        end
-    end
-
-    log_info("Extracted $(length(triples)) triples")
     return triples
 end
 
