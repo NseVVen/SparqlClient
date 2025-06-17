@@ -13,7 +13,6 @@ using Logging
 using Printf
 
 
-# export API
 export SparqlClientSession, Triple, set_query, set_query_type, set_return_format,
        set_query_method, query, query_and_convert,
        parse_rdf_triples, extract_rdf_triples, rdf_query_as_triples,
@@ -27,7 +26,6 @@ export SparqlClientSession, Triple, set_query, set_query_type, set_return_format
        SELECT_SUBJECTS_REFERRING_RESOURCE
 
 
-# Основные типы
 
 """
     mutable struct SparqlClientSession
@@ -85,8 +83,6 @@ SparqlClientSession(endpoint::String) = begin
     SparqlClientSession(endpoint, nothing, :select, :json, false, nothing, Dict())
 end
 
-
-# Установка параметров запроса
 
 
 """
@@ -146,8 +142,6 @@ function set_query_method(session::SparqlClientSession, method::Symbol)
     end
 end
 
-
-# Выполнение запроса
 
 
 """
@@ -250,8 +244,6 @@ function query_and_convert(session::SparqlClientSession; extra_params::Dict=Dict
 end
 
 
-# Парсинг RDF/XML ответов
-
 
 """
     parse_rdf_triples(xml::EzXML.Document) → Vector{Triple}
@@ -264,16 +256,11 @@ function parse_rdf_triples(xml::EzXML.Document)::Vector{Triple}
     root = EzXML.root(xml)
 
     for node in EzXML.elements(root)
-        # Интересуют только узлы <Description>
         EzXML.nodename(node) == "Description" || continue
-
-        # subject: атрибут rdf:about или "(no subject)"
         subj = haskey(node, "rdf:about") ? node["rdf:about"] : "(no subject)"
 
         for child in EzXML.elements(node)
             pred = EzXML.nodename(child)
-
-            # object: сначала rdf:resource, потом rdf:nodeID, иначе текст ноды
             obj = if haskey(child, "rdf:resource")
                 child["rdf:resource"]
             elseif haskey(child, "rdf:nodeID")
@@ -334,8 +321,6 @@ function rdf_query_as_triples(session::SparqlClientSession)::Vector{Triple}
     return extract_rdf_triples(doc)
 end
 
-
-# Сохранение результатов
 
 
 """
@@ -462,4 +447,4 @@ function apply_template(session::SparqlClientSession)
     set_query(session, expand_query(session))
 end
 
-end # module SparqlClient
+end 
