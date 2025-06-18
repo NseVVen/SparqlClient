@@ -17,3 +17,9 @@
 
 ## Установка
 
+Из Git-репозитория
+Если вы хотите работать с последней (возможно нестабильной) версией:
+
+julia> using Pkg
+julia> Pkg.add(url="https://github.com/Ваш_Путь/SparqlClient.jl.git")
+
